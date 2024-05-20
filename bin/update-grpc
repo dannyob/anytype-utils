@@ -1,0 +1,42 @@
+#!/bin/sh
+##
+# update-grpc - Creates python source from Anytype-heart grpc specifications
+###
+
+
+if [ -z "$ATUTILS_ROOT" ]; then
+    echo "Environment variable ATUTILS_ROOT is not defined"
+    echo "Have you tried 'source bin/u-activate'?"
+    exit 1
+fi
+
+TEMP_DIR=$(mktemp -d)
+
+if ! git clone --depth=1 https://github.com/anyproto/anytype-heart.git "$TEMP_DIR"; then
+    echo "Error: Unable to clone repository https://github.com/anyproto/anytype-heart/"
+    exit 1
+fi
+
+# Ensure the target directory exists
+if [ ! -d "$ATUTILS_ROOT/pb/protos" ]; then
+    mkdir -p "$ATUTILS_ROOT/pb/protos"
+fi
+if [ ! -d "$ATUTILS_ROOT/pkg/lib/pb/" ]; then
+    mkdir -p "$ATUTILS_ROOT/pkg/lib/pb"
+fi
+
+rm -rf "$ATUTILS_ROOT/pb/protos/*"
+rm -rf "$ATUTILS_ROOT/pkg/lib/pb/*"
+
+# Copy over all files from the cloned repository
+cp -r "$TEMP_DIR/pb/protos/"* "$ATUTILS_ROOT/pb/protos/"
+cp -r "$TEMP_DIR/pkg/lib/pb/"* "$ATUTILS_ROOT/pkg/lib/pb/"
+
+# Delete the temporary directory
+rm -rf "$TEMP_DIR"
+
+# Change directory to $ATUTILS_ROOT
+cd "$ATUTILS_ROOT" || exit
+
+# Run the protoc command
+python -m grpc_tools.protoc -I . --python_out=. --pyi_out=. --grpc_python_out=. pb/protos/*.proto pb/protos/*/*.proto pkg/lib/pb/model/protos/*.proto pkg/lib/pb/storage/protos/*.proto
