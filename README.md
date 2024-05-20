@@ -20,7 +20,11 @@ port = os.getenv("ANYTYPE_PORT")
 
 # First we connect to the local middleware
 # that runs behind the Anytype desktop app
-c = Client.connect(f"localhost:{port}")
+c = Client(f"localhost:{port}")
+
+print(c.AppGetVersion())
+# You'll get something like:
+# {'error': {}, 'version': 'v0.33.2', 'details': 'build on 2024-04-25 13:28:54 +0000 UTC at #4ec64b016e2be3a5229dc865452c066f653e209c'}
 
 # Now we unlock using our passphrase -- this function
 # will use the ANYTYPE_PW environment variable, or
