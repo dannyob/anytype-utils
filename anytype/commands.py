@@ -67,7 +67,9 @@ class Client:
         request = commands.Rpc.__dict__[obj].__dict__[verb].Request(**kwargs)
         return self._send(self.stub.__dict__[rpc_command], request, auth)
 
-    def __init__(self, connection):
+    def __init__(self, connection=None):
+        if not connection and ("ANYTYPE_PORT" in os.environ):
+            connection = f"localhost:{os.getenv('ANYTYPE_PORT')}"
         self.channel = service.grpc.insecure_channel(connection)
         self.stub = service.ClientCommandsStub(self.channel)
         self.rpc_commands = self.stub.__dict__.keys()
