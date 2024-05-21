@@ -8,6 +8,9 @@
 # probably install it.
 ###
 
+# save list of environment variables that previously existed
+orig_vars=$(env | sed 's/=.*$//')
+
 if [ -n "$BASH_VERSION" ]; then
     script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 elif [ -n "$ZSH_VERSION" ]; then
@@ -29,20 +32,13 @@ fi
 . "$ATUTILS_ROOT/.venv/bin/activate"
 PATH="$ATUTILS_ROOT/bin:$PATH"
 
-# Get the account id that is used in the Apple Keychain
-case "$(uname)" in
-    Darwin)
-    ANYTYPE_ACCOUNT=$(basename ~/Library/Application\ Support/anytype/data/????*)
-        ;;
-    Linux)
-    ANYTYPE_ACCOUNT=$(basename ~/.config/anytype/data/????*)
-        ;;
-       *)
-        die "Unknown operating system"
-        ;;
-esac
-
-. <(gpg --decrypt < ~/Private/secrets/anytype-utils/env.gpg)
+u-deactivate() {
+    echo "$ATUTILS_NEWVARS" | while IFS= read -r var; do
+        unset "$var"
+        done
+        unset ATUTILS_NEWVARS
+    deactivate
+}
 
 # Default to going to the root of project
 cd() {
@@ -53,4 +49,27 @@ cd() {
     fi
 }
 
+
 # Project utilities
+
+# Get the account id that is used in the Apple Keychain
+case "$(uname)" in
+    Darwin)
+    declare -x ANYTYPE_ACCOUNT=$(basename ~/Library/Application\ Support/anytype/data/????*)
+    declare -x ANYTYPE_PW=$(security find-generic-password -a $ANYTYPE_ACCOUNT -w)
+        ;;
+    Linux)
+    declare -x ANYTYPE_ACCOUNT=$(basename ~/.config/anytype/data/????*)
+        ;;
+       *)
+        die "Unknown operating system"
+        ;;
+esac
+
+# Or use your own secret store to set environment variables here
+if [ -d ~/Private/secrets/anytype-utils/ ]; then
+. <(gpg --decrypt < ~/Private/secrets/anytype-utils/env.gpg)
+fi
+
+# record what variables were set so we can unset them
+ATUTILS_NEWVARS=$(cat <(echo "$orig_vars") <(env | sed 's/=.*$//') | sort | uniq -u)
