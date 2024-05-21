@@ -6,7 +6,10 @@ The story so far:
 Initiation on the command line:
 ```sh
 . bin/u-activate
-bin/update-grpc
+make grpc
+
+# find the port on which to talk to Anytype Heart (should be running whenever you are using Anytype).
+# Works on Mac and Linux
 declare -x ANYTYPE_PORT=$(lsof -i -P -n | grep "anytype.*LISTEN" | sed -e 's/.*://' -e 's/ .*//g' | sort -n | head -n1)
 declare -x ANYTYPE_PW=<your passphrase>
 ```
@@ -14,6 +17,7 @@ declare -x ANYTYPE_PW=<your passphrase>
 A sample Python program
 ```python
 import os
+from pprint import pp
 from anytype.commands import Client
 
 port = os.getenv("ANYTYPE_PORT")
@@ -30,5 +34,8 @@ print(c.AppGetVersion())
 # will use the ANYTYPE_PW environment variable, or
 # WalletCreateSession(mnemonic = <your passphrase here>)
 c.WalletCreateSession()
+
+pp(c.ObjectSearch(fullText=""))
+
 ```
 
