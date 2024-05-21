@@ -57,12 +57,15 @@ case "$(uname)" in
     Darwin)
     declare -x ANYTYPE_ACCOUNT=$(basename ~/Library/Application\ Support/anytype/data/????*)
     declare -x ANYTYPE_PW=$(security find-generic-password -a $ANYTYPE_ACCOUNT -w)
+    declare -x ANYTYPE_PORT=$(lsof -i -P -n | grep "anytype.*LISTEN" | sed -e 's/.*://' -e 's/ .*//g' | sort -n | head -n1)
         ;;
     Linux)
     declare -x ANYTYPE_ACCOUNT=$(basename ~/.config/anytype/data/????*)
+    declare -x ANYTYPE_PORT=$(lsof -i -P -n | grep "anytype.*LISTEN" | sed -e 's/.*://' -e 's/ .*//g' | sort -n | head -n1)
         ;;
        *)
-        die "Unknown operating system"
+        echo "Warning: you should set ANYTYPE_PW (your Anytype passphrase) and ANYTYPE_PORT (your app port number) manually."
+        echo "Please mail me at danny@spesh.com to debug!"
         ;;
 esac
 
@@ -71,5 +74,5 @@ if [ -d ~/Private/secrets/anytype-utils/ ]; then
 . <(gpg --decrypt < ~/Private/secrets/anytype-utils/env.gpg)
 fi
 
-# record what variables were set so we can unset them
+# record what variables were set so we can unset them when we deactivate
 ATUTILS_NEWVARS=$(cat <(echo "$orig_vars") <(env | sed 's/=.*$//') | sort | uniq -u)
