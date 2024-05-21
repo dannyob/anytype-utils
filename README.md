@@ -1,17 +1,21 @@
 # anytype-utils
-Command-line utilities for Anytype
+Command-line utilities for Anytype in Python, including an unofficial API
+library based on the internal Anytype Hearts middleware.
 
-The story so far:
+WARNING! I am not connected to the Anytype project. Using this API could render
+your space or your app inoperable!
+
+If you want something stable and safe, please wait for the Anyteam's official
+API.
 
 Initiation on the command line:
 ```sh
 . bin/u-activate
-make grpc
+make deps
 
-# find the port on which to talk to Anytype Heart (should be running whenever you are using Anytype).
+# First find the port on which to talk to Anytype Heart (should be running whenever you are using Anytype).
 # Works on Mac and Linux
 declare -x ANYTYPE_PORT=$(lsof -i -P -n | grep "anytype.*LISTEN" | sed -e 's/.*://' -e 's/ .*//g' | sort -n | head -n1)
-declare -x ANYTYPE_PW=<your passphrase>
 ```
 
 A sample Python program
@@ -38,4 +42,12 @@ c.WalletCreateSession()
 pp(c.ObjectSearch(fullText=""))
 
 ```
+
+There's a [list of the
+commands](https://github.com/anyproto/anytype-heart/blob/main/docs/proto.md#anytype-ClientCommands)
+on the Anytype Heart repo.
+
+Valid arguments are listed in the Request field descriptions. The Hearts'
+Middleware API is primarily used as the backend to the various client apps, so
+the commands will be related to UI display and actions.
 
