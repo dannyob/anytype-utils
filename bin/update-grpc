@@ -17,26 +17,29 @@ if ! git clone --depth=1 https://github.com/anyproto/anytype-heart.git "$TEMP_DI
     exit 1
 fi
 
-# Ensure the target directory exists
-if [ ! -d "$ATUTILS_ROOT/pb/protos" ]; then
-    mkdir -p "$ATUTILS_ROOT/pb/protos"
-fi
-if [ ! -d "$ATUTILS_ROOT/pkg/lib/pb/" ]; then
-    mkdir -p "$ATUTILS_ROOT/pkg/lib/pb"
-fi
+rm -rf "$ATUTILS/anytype/utils/pb"
+rm -rf "$ATUTILS/anytype/utils/pkg"
 
-rm -rf "$ATUTILS_ROOT/pb/protos/*"
-rm -rf "$ATUTILS_ROOT/pkg/lib/pb/*"
+# Ensure the target directory exists
+if [ ! -d "$ATUTILS_ROOT/anytype/utils/pb/protos" ]; then
+    mkdir -p "$ATUTILS_ROOT/anytype/utils/pb/protos"
+fi
+if [ ! -d "$ATUTILS_ROOT/anytype/utils/pkg/lib/pb/" ]; then
+    mkdir -p "$ATUTILS_ROOT/anytype/utils/pkg/lib/pb"
+fi
 
 # Copy over all files from the cloned repository
-cp -r "$TEMP_DIR/pb/protos/"* "$ATUTILS_ROOT/pb/protos/"
-cp -r "$TEMP_DIR/pkg/lib/pb/"* "$ATUTILS_ROOT/pkg/lib/pb/"
+cp -r "$TEMP_DIR/pb/protos/"* "$ATUTILS_ROOT/anytype/utils/pb/protos/"
+cp -r "$TEMP_DIR/pkg/lib/pb/"* "$ATUTILS_ROOT/anytype/utils/pkg/lib/pb/"
 
 # Delete the temporary directory
 rm -rf "$TEMP_DIR"
 
 # Change directory to $ATUTILS_ROOT
-cd "$ATUTILS_ROOT" || exit
+cd "$ATUTILS_ROOT/anytype/utils/" || exit
 
 # Run the protoc command
 python -m grpc_tools.protoc -I . --python_out=. --pyi_out=. --grpc_python_out=. pb/protos/*.proto pb/protos/*/*.proto pkg/lib/pb/model/protos/*.proto pkg/lib/pb/storage/protos/*.proto
+find . -type d -exec touch {}/__init__.py \;
+find .  -name '*.py' -type f -exec sed -i '' 's/^from pb/from anytype.utils.pb/' {} +
+find .  -name '*.py' -type f -exec sed -i '' 's/^from pkg/from anytype.utils.pkg/' {} +
