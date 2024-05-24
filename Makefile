@@ -20,9 +20,9 @@ deps: grpc
 
 install:
 	@if command -v uv > /dev/null 2>&1; then \
-        uv pip install . ; \
+        uv pip install --force-reinstall . ; \
     else \
-        pip install . ; \
+        pip install --force-reinstall . ; \
     fi
 
 launch-app:
