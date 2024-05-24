@@ -10,12 +10,20 @@ help:
 	@echo "make grpc	-- Download the protobuf/grpc definitions for anytype-heart and compile them into Python"
 	@echo "make launch-app	-- Use Anytype's nativeMessaginHost program to launch Anytype (Mac only - patches accepted)"
 	@echo "make get-ports	-- Use Anytype's nativeMessaginHost program to get Anytype ports (Mac only - patches accepted)"
+	@echo "make install	-- Install as local Python package"
 
 grpc:
 	bin/update-grpc
 
 deps: grpc
 	pip install -r requirements.txt
+
+install:
+	@if command -v uv > /dev/null 2>&1; then \
+        uv pip install . ; \
+    else \
+        pip install . ; \
+    fi
 
 launch-app:
 	@printf '\x15\0\0\0{"type": "launchApp"}' | '/Applications/Anytype.app/Contents/Resources/app.asar.unpacked/dist/nativeMessagingHost' | cut -c 5- | jq .
