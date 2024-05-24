@@ -8,7 +8,7 @@ from os.path import commonprefix
 def obj_prefix_dict(commands, objects):
     """This terrifying function takes a list of gRPC commands (which take the
     form of ObjectVerb, like "AppGetVersion" and "BlockSearch") and a list of
-    object anmes (which have the form of "App" and "Block"), and returns a
+    object names (which have the form of "App" and "Block"), and returns a
     mapping from the full command to the its object-name prefix.
 
     We need this, because request and responses are stored under their object
@@ -79,7 +79,7 @@ class Client:
 
     def __getattr__(self, method):
         """If a nonexistent method is called, see if it matches a rpc command.
-        If it does, then do call that commands."""
+        If it does, then do the call for that command."""
 
         def do_command(self=self, **kwargs):
             nonlocal method
@@ -99,7 +99,8 @@ class Client:
             else:
                 raise "WalletCreateSession needs an Anytype passphrase"
         response = self._callRpc("WalletCreateSession", auth=False, **kwargs)
-        self.token = response["token"]  # TODO error handling
+        if "token" in response:
+            self.token = response["token"]  # TODO error handling
         return response
 
     def AppGetVersion(self, **kwargs):
