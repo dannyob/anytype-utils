@@ -1,5 +1,5 @@
-import pb.protos.service.service_pb2_grpc as service
-import pb.protos.commands_pb2 as commands
+from .pb.protos.service import service_pb2_grpc as service
+from .pb.protos import commands_pb2 as commands
 import google.protobuf.json_format as jf
 import os
 from os.path import commonprefix

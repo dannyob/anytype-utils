@@ -13,6 +13,7 @@ setup(
     install_requires=read_requirements(),
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
+    license="AGPL-3.0-or-later",
     author="Danny O'Brien",
     author_email="danny@spesh.com",
     description="Unofficial Python interface to Anytype",
