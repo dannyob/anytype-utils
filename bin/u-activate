@@ -43,9 +43,9 @@ u-deactivate() {
 # Default to going to the root of project
 cd() {
     if [[ $# -eq 0 ]]; then
-        builtin cd "$ATUTILS_ROOT" || builtin cd || exit
+        builtin cd "$ATUTILS_ROOT" || builtin cd
     else
-        builtin cd "$@" || exit
+        builtin cd "$@"
     fi
 }
 
